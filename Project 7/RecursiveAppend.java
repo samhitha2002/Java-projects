@@ -2,7 +2,7 @@
  *  Compilation:  javac RecursiveAppend.java
  *  Execution:    java RecursiveAppend
  *
- *  @author: Samhitha Padmanabhini, sp1949@scarletmail.rutgers.edu, sp1949
+ *  @author: Samhitha Padmanabhini
  *
  *************************************************************************/
 
