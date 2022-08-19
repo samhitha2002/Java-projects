@@ -2,7 +2,7 @@
  *  Compilation:  javac RandomWalker.java
  *  Execution:    java RandomWalker 10
  *
- *  @author: Samhitha Padmanabhini, sp1949@scarletmail.rutgers.edu, sp1949
+ *  @author: Samhitha Padmanabhini
  *
  * The program RandomWalker that takes an int command-line argument n
  * and simulates the motion of a random walk for n steps. Print the
