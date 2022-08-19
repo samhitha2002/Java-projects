@@ -53,6 +53,10 @@ public class PolygonTransform {
 
     // Tests each of the API methods by directly calling them. 
     public static void main(String[] args) {
+        
+        // This section is commented out. Include what you want the shape to do (For example: If you want the shape to rotate, then include that part
+        // from the below code). The shape can rotate, translate and scales.
+        
         //Rotates
         /*StdDraw.setScale(-5.0, +5.0); 
         double[] x = { 0, 1, 1, 0 }; 
