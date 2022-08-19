@@ -2,7 +2,7 @@
  *  Compilation:  javac LargestOfFive.java
  *  Execution:    java LargestOfFive 35 10 32 1 8
  *
- *  @author: Samhitha Padmanabhini, sp1949@scarletmail.rutgers.edu, sp1949
+ *  @author: Samhitha Padmanabhini
  *
  *  Takes five distinct integers as command-line arguments and prints the 
  *  largest value
