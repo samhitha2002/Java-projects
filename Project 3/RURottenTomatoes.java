@@ -2,7 +2,7 @@
  *  Compilation:  javac RURottenTomatoes.java
  *  Execution:    java RURottenTomatoes
  *
- *  @author: Samhitha Padmanabhini, sp1949@scarletmail.rutgers.edu, sp1949
+ *  @author: Samhitha Padmanabhini
  *
  * RURottenTomatoes creates a 2 dimensional array of movie ratings 
  * from the command line arguments and displays the index of the movie 
