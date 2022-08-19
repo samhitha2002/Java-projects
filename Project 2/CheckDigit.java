@@ -2,7 +2,7 @@
  *  Compilation:  javac CheckDigit.java
  *  Execution:    java CheckDigit 020131452
  *
- *  @author: Samhitha Padmanabhini, sp1949@scarletmail.rutgers.edu, sp1949
+ *  @author: Samhitha Padmanabhini
  *
  *  Takes a 12 or 13 digit integer as a command line argument, then computes
  *  and displays the check digit
