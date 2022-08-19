@@ -2,7 +2,7 @@
  *  Compilation:  javac ScenarioAnalysis.java
  *  Execution:    java ScenarioAnalysis
  *
- *  @author: Samhitha Padmanabhini, sp1949@scarletmail.rutgers.edu, sp1949
+ *  @author: Samhitha Padmanabhini
  *
  *************************************************************************/
 public class ScenarioAnalysis {
