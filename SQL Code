@@ -1,1 +1,1252 @@
+USE Project;
 
+DROP TABLE IF EXISTS Income;
+DROP TABLE IF EXISTS Stock;
+DROP TABLE IF EXISTS Company;
+
+CREATE TABLE Company (
+    Ticker VARCHAR(10) PRIMARY KEY,
+    Company VARCHAR(255),
+    Fiscal_Year_End Integer,
+    Morningstar_Size VARCHAR(50),
+    Morningstart_Style VARCHAR(50),
+    Sector VARCHAR(50),
+    Industry VARCHAR(50)
+);
+
+CREATE TABLE Income (
+    Ticker VARCHAR(10),
+    Year INTEGER,
+    Revenue DECIMAL(30, 2),
+    Operating_Income DECIMAL(30, 2),
+    Net_Income DECIMAL(30, 2),
+    Basic_EPS DECIMAL(30, 4),
+    Diluted_EPS DECIMAL(30, 4),
+    Basic_WASO DECIMAL(30, 2),
+    Diluted_WASO DECIMAL(30, 2),
+    PRIMARY KEY (Ticker, Year),
+    FOREIGN KEY (Ticker) REFERENCES Company(Ticker)
+);
+
+CREATE TABLE Stock (
+    Ticker VARCHAR(10),
+    Date DATE,
+    Close DECIMAL(20, 2),
+    Volume INT,
+    Open DECIMAL(20, 2),
+    High DECIMAL(20, 2),
+    Low DECIMAL(20, 2),
+    PRIMARY KEY (Ticker, Date),
+    FOREIGN KEY (Ticker) REFERENCES Company(Ticker)
+);
+
+INSERT INTO Company (Ticker, Company, Fiscal_Year_End, Morningstar_Size, Morningstart_Style, Sector, Industry)
+SELECT *
+FROM company_src;
+
+-- SELECT *
+-- FROM Company;
+
+UPDATE amzn_historicaldata
+SET Close = REPLACE(Close, '$', ''),
+	Open = REPLACE(Open, '$', ''),
+	High = REPLACE(High, '$', ''),
+    -- Date = (STR_TO_DATE(Date, '%m/%d/%y')),
+	Low = REPLACE(Low, '$', '');
+
+UPDATE appl_historicaldata
+SET Close = REPLACE(Close, '$', ''),
+	Open = REPLACE(Open, '$', ''),
+	High = REPLACE(High, '$', ''),
+    -- Date = (STR_TO_DATE(Date, '%m/%d/%y')),
+	Low = REPLACE(Low, '$', '');
+
+UPDATE csco_historicaldata
+SET Open = REPLACE(Open, '$', ''),
+	Close = REPLACE(Close, '$', ''),
+	High = REPLACE(High, '$', ''),
+    -- Date = (STR_TO_DATE(Date, '%m/%d/%y')),
+	Low = REPLACE(Low, '$', '');
+
+UPDATE meta_historicaldata
+SET Open = REPLACE(Open, '$', ''),
+	Close = REPLACE(Close, '$', ''),
+	High = REPLACE(High, '$', ''),
+    -- Date = (STR_TO_DATE(Date, '%m/%d/%y')),
+	Low = REPLACE(Low, '$', '');
+
+UPDATE mfst_historicaldata
+SET Open = REPLACE(Open, '$', ''),
+	Close = REPLACE(Close, '$', ''),
+	High = REPLACE(High, '$', ''),
+    -- Date = (STR_TO_DATE(Date, '%m/%d/%y')),
+	Low = REPLACE(Low, '$', '');
+
+UPDATE nflx_historicaldata
+SET Open = REPLACE(Open, '$', ''),
+	Close = REPLACE(Close, '$', ''),
+	High = REPLACE(High, '$', ''),
+    -- Date = (STR_TO_DATE(Date, '%m/%d/%y')),
+	Low = REPLACE(Low, '$', '');
+
+UPDATE qcom_historicaldata
+SET Open = REPLACE(Open, '$', ''),
+	Close = REPLACE(Close, '$', ''),
+	High = REPLACE(High, '$', ''),
+    -- Date = (STR_TO_DATE(Date, '%m/%d/%y')),
+	Low = REPLACE(Low, '$', '');
+
+UPDATE sbux_historicaldata
+SET Open = REPLACE(Open, '$', ''),
+	Close = REPLACE(Close, '$', ''),
+	High = REPLACE(High, '$', ''),
+    -- Date = (STR_TO_DATE(Date, '%m/%d/%y')),
+	Low = REPLACE(Low, '$', '');
+
+UPDATE tsla_historicaldata
+SET Open = REPLACE(Open, '$', ''),
+	Close = REPLACE(Close, '$', ''),
+	High = REPLACE(High, '$', ''),
+    -- Date = (STR_TO_DATE(Date, '%m/%d/%y')),
+	Low = REPLACE(Low, '$', '');
+
+INSERT INTO Stock (Ticker, Date, Close, Volume, Open, High, Low)
+SELECT 'amzn' AS Ticker, Date, Close, Volume, Open, High, Low
+FROM amzn_historicaldata;
+
+INSERT INTO Stock (Ticker, Date, Close, Volume, Open, High, Low)
+SELECT 'appl' AS Ticker, Date, Close, Volume, Open, High, Low
+FROM appl_historicaldata;
+
+INSERT INTO Stock (Ticker, Date, Close, Volume, Open, High, Low)
+SELECT 'csco' AS Ticker, Date, Close, Volume, Open, High, Low
+FROM csco_historicaldata;
+
+INSERT INTO Stock (Ticker, Date, Close, Volume, Open, High, Low)
+SELECT 'meta' AS Ticker, Date, Close, Volume, Open, High, Low
+FROM meta_historicaldata;
+
+INSERT INTO Stock (Ticker, Date, Close, Volume, Open, High, Low)
+SELECT 'mfst' AS Ticker, Date, Close, Volume, Open, High, Low
+FROM mfst_historicaldata;
+
+INSERT INTO Stock (Ticker, Date, Close, Volume, Open, High, Low)
+SELECT 'nflx' AS Ticker, Date, Close, Volume, Open, High, Low
+FROM nflx_historicaldata;
+
+INSERT INTO Stock (Ticker, Date, Close, Volume, Open, High, Low)
+SELECT 'qcom' AS Ticker, Date, Close, Volume, Open, High, Low
+FROM qcom_historicaldata;
+
+INSERT INTO Stock (Ticker, Date, Close, Volume, Open, High, Low)
+SELECT 'sbux' AS Ticker, Date, Close, Volume, Open, High, Low
+FROM sbux_historicaldata;
+
+INSERT INTO Stock (Ticker, Date, Close, Volume, Open, High, Low)
+SELECT 'tsla' AS Ticker, Date, Close, Volume, Open, High, Low
+FROM tsla_historicaldata;
+
+-- SELECT *
+-- FROM Stock;
+
+-- SELECT Ticker, COUNT(*)
+-- FROM Stock
+-- GROUP BY Ticker;
+
+-- AMAZON 
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'amzn' AS Ticker, 2013 AS Year, 
+		MAX(CASE WHEN Income_Category = 'Revenue' THEN `2013` end) AS Revenue,
+        MAX(CASE WHEN Income_Category = 'Operating_Income' THEN `2013` end) AS Operating_Income,
+        MAX(CASE WHEN Income_Category = 'Net_Income' THEN `2013` end) AS Net_Income,
+        MAX(CASE WHEN Income_Category = 'Basic_EPS' THEN `2013` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_Category = 'Diluted_EPS' THEN `2013` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_Category = 'Basic_WASO' THEN `2013` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_Category = 'Diluted_WASO' THEN `2013` end) AS Diluted_WASO
+
+--         MAX(IF(Income_Category = 'Revenue', `2013`, NULL)) AS Revenue,
+--         MAX(IF(Income_Category = 'Operating_Income', `2013`, NULL)) AS Operating_Income,
+--         MAX(IF(Income_Category = 'Net_Income', `2013`, NULL)) AS Net_Income,
+--         MAX(IF(Income_Category = 'Basic_EPS', `2013`, NULL)) AS Basic_EPS,
+--         MAX(IF(Income_Category = 'Diluted_EPS', `2013`, NULL)) AS Diluted_EPS,
+--         MAX(IF(Income_Category = 'Basic_WASO', `2013`, NULL)) AS Basic_WASO,
+--         MAX(IF(Income_Category = 'Diluted_WASO', `2013`, NULL)) AS Diluted_WASO
+FROM amzn_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'amzn' AS Ticker, 2014 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2014` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2014` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2014` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2014` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2014` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2014` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2014` end) AS Diluted_WASO
+FROM amzn_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'amzn' AS Ticker, 2015 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2015` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2015` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2015` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2015` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2015` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2015` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2015` end) AS Diluted_WASO
+FROM amzn_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'amzn' AS Ticker, 2016 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2016` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2016` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2016` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2016` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2016` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2016` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2016` end) AS Diluted_WASO
+FROM amzn_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'amzn' AS Ticker, 2017 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2017` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2017` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2017` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2017` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2017` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2017` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2017` end) AS Diluted_WASO
+FROM amzn_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'amzn' AS Ticker, 2018 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2018` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2018` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2018` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2018` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2018` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2018` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2018` end) AS Diluted_WASO
+FROM amzn_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'amzn' AS Ticker, 2019 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2019` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2019` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2019` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2019` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2019` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2019` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2019` end) AS Diluted_WASO
+FROM amzn_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'amzn' AS Ticker, 2020 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2020` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2020` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2020` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2020` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2020` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2020` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2020` end) AS Diluted_WASO
+FROM amzn_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'amzn' AS Ticker, 2021 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2021` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2021` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2021` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2021` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2021` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2021` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2021` end) AS Diluted_WASO
+FROM amzn_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'amzn' AS Ticker, 2022 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2022` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2022` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2022` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2022` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2022` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2022` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2022` end) AS Diluted_WASO
+FROM amzn_income;
+
+-- APPLE
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'appl' AS Ticker, 2014 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2014` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2014` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2014` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2014` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2014` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2014` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2014` end) AS Diluted_WASO
+FROM appl_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'appl' AS Ticker, 2015 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2015` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2015` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2015` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2015` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2015` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2015` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2015` end) AS Diluted_WASO
+FROM appl_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'appl' AS Ticker, 2016 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2016` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2016` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2016` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2016` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2016` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2016` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2016` end) AS Diluted_WASO
+FROM appl_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'appl' AS Ticker, 2017 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2017` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2017` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2017` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2017` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2017` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2017` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2017` end) AS Diluted_WASO
+FROM appl_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'appl' AS Ticker, 2018 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2018` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2018` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2018` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2018` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2018` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2018` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2018` end) AS Diluted_WASO
+FROM appl_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'appl' AS Ticker, 2019 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2019` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2019` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2019` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2019` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2019` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2019` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2019` end) AS Diluted_WASO
+FROM appl_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'appl' AS Ticker, 2020 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2020` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2020` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2020` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2020` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2020` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2020` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2020` end) AS Diluted_WASO
+FROM appl_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'appl' AS Ticker, 2021 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2021` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2021` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2021` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2021` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2021` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2021` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2021` end) AS Diluted_WASO
+FROM appl_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'appl' AS Ticker, 2022 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2022` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2022` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2022` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2022` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2022` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2022` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2022` end) AS Diluted_WASO
+FROM appl_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'appl' AS Ticker, 2023 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2023` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2023` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2023` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2023` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2023` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2023` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2023` end) AS Diluted_WASO
+FROM appl_income;
+
+-- CSCO
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'csco' AS Ticker, 2014 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2014` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2014` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2014` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2014` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2014` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2014` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2014` end) AS Diluted_WASO
+FROM csco_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'csco' AS Ticker, 2015 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2015` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2015` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2015` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2015` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2015` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2015` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2015` end) AS Diluted_WASO
+FROM csco_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'csco' AS Ticker, 2016 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2016` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2016` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2016` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2016` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2016` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2016` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2016` end) AS Diluted_WASO
+FROM csco_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'csco' AS Ticker, 2017 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2017` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2017` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2017` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2017` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2017` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2017` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2017` end) AS Diluted_WASO
+FROM csco_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'csco' AS Ticker, 2018 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2018` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2018` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2018` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2018` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2018` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2018` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2018` end) AS Diluted_WASO
+FROM csco_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'csco' AS Ticker, 2019 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2019` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2019` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2019` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2019` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2019` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2019` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2019` end) AS Diluted_WASO
+FROM csco_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'csco' AS Ticker, 2020 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2020` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2020` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2020` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2020` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2020` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2020` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2020` end) AS Diluted_WASO
+FROM csco_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'csco' AS Ticker, 2021 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2021` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2021` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2021` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2021` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2021` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2021` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2021` end) AS Diluted_WASO
+FROM csco_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'csco' AS Ticker, 2022 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2022` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN  `2022` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN  `2022` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN  `2022` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN  `2022` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN  `2022` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN  `2022` end) AS Diluted_WASO
+FROM csco_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'csco' AS Ticker, 2023 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2023` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2023` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2023` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2023` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2023` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2023` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2023` end) AS Diluted_WASO
+FROM csco_income;
+
+-- meta
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'meta' AS Ticker, 2013 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2013` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2013` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2013` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2013` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2013` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2013` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2013` end) AS Diluted_WASO
+FROM meta_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'meta' AS Ticker, 2014 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2014` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2014` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2014` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2014` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2014` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2014` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2014` end) AS Diluted_WASO
+FROM meta_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'meta' AS Ticker, 2015 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2015` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2015` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2015` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2015` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2015` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2015` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2015` end) AS Diluted_WASO
+FROM meta_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'meta' AS Ticker, 2016 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2016` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2016` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2016` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2016` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2016` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2016` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2016` end) AS Diluted_WASO
+FROM meta_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'meta' AS Ticker, 2017 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2017` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2017` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2017` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2017` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2017` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2017` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2017` end) AS Diluted_WASO
+FROM meta_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'meta' AS Ticker, 2018 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2018` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2018` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2018` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2018` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2018` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2018` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2018` end) AS Diluted_WASO
+FROM meta_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'meta' AS Ticker, 2019 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2019` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2019` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2019` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2019` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2019` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2019` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2019` end) AS Diluted_WASO
+FROM meta_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'meta' AS Ticker, 2020 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2020` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2020` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2020` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2020` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2020` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2020` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2020` end) AS Diluted_WASO
+FROM meta_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'meta' AS Ticker, 2021 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2021` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2021` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2021` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2021` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2021` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2021` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2021` end) AS Diluted_WASO
+FROM meta_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'meta' AS Ticker, 2022 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2022` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2022` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2022` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2022` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2022` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2022` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2022` end) AS Diluted_WASO
+FROM meta_income;
+
+-- NFLX
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'nflx' AS Ticker, 2013 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2013` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2013` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2013` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2013` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2013` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2013` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2013` end) AS Diluted_WASO
+FROM nflx_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'nflx' AS Ticker, 2014 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2014` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2014` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2014` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2014` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2014` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2014` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2014` end) AS Diluted_WASO
+FROM nflx_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'nflx' AS Ticker, 2015 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2015` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2015` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2015` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2015` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2015` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2015` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2015` end) AS Diluted_WASO
+FROM nflx_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'nflx' AS Ticker, 2016 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2016` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2016` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2016` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2016` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2016` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2016` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2016` end) AS Diluted_WASO
+FROM nflx_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'nflx' AS Ticker, 2017 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2017` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2017` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2017` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2017` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2017` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2017` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2017` end) AS Diluted_WASO
+FROM nflx_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'nflx' AS Ticker, 2018 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2018` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2018` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2018` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2018` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2018` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2018` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2018` end) AS Diluted_WASO
+FROM nflx_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'nflx' AS Ticker, 2019 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2019` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2019` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2019` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2019` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2019` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2019` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2019` end) AS Diluted_WASO
+FROM nflx_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'nflx' AS Ticker, 2020 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2020` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2020` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2020` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2020` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2020` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2020` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2020` end) AS Diluted_WASO
+FROM nflx_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'nflx' AS Ticker, 2021 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2021` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2021` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2021` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2021` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2021` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2021` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2021` end) AS Diluted_WASO
+FROM nflx_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'nflx' AS Ticker, 2022 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2022` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2022` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2022` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2022` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2022` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2022` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2022` end) AS Diluted_WASO
+FROM nflx_income;
+
+-- QCOM
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'qcom' AS Ticker, 2014 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2014` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2014` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2014` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2014` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2014` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2014` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2014` end) AS Diluted_WASO
+FROM qcom_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'qcom' AS Ticker, 2015 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2015` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2015` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2015` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2015` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2015` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2015` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2015` end) AS Diluted_WASO
+FROM qcom_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'qcom' AS Ticker, 2016 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2016` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2016` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2016` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2016` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2016` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2016` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2016` end) AS Diluted_WASO
+FROM qcom_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'qcom' AS Ticker, 2017 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2017` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2017` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2017` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2017` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2017` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2017` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2017` end) AS Diluted_WASO
+FROM qcom_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'qcom' AS Ticker, 2018 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2018` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2018` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2018` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2018` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2018` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2018` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2018` end) AS Diluted_WASO
+FROM qcom_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'qcom' AS Ticker, 2019 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2019` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2019` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2019` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2019` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2019` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2019` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2019` end) AS Diluted_WASO
+FROM qcom_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'qcom' AS Ticker, 2020 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2020` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2020` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2020` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2020` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2020` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2020` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2020` end) AS Diluted_WASO
+FROM qcom_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'qcom' AS Ticker, 2021 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2021` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2021` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2021` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2021` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2021` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2021` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2021` end) AS Diluted_WASO
+FROM qcom_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'qcom' AS Ticker, 2022 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2022` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2022` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2022` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2022` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2022` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2022` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2022` end) AS Diluted_WASO
+FROM qcom_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'qcom' AS Ticker, 2023 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2023` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2023` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2023` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2023` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2023` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2023` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2023` end) AS Diluted_WASO
+FROM qcom_income;
+
+-- SBUX 
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'sbux' AS Ticker, 2013 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2013` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2013` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2013` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2013` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2013` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2013` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2013` end) AS Diluted_WASO
+FROM sbux_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'sbux' AS Ticker, 2014 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2014` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2014` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2014` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2014` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2014` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2014` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2014` end) AS Diluted_WASO
+FROM sbux_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'sbux' AS Ticker, 2015 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2015` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2015` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2015` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2015` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2015` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2015` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2015` end) AS Diluted_WASO
+FROM sbux_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'sbux' AS Ticker, 2016 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2016` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2016` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2016` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2016` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2016` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2016` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2016` end) AS Diluted_WASO
+FROM sbux_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'sbux' AS Ticker, 2017 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2017` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2017` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2017` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2017` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2017` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2017` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2017` end) AS Diluted_WASO
+FROM sbux_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'sbux' AS Ticker, 2018 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2018` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2018` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2018` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2018` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2018` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2018` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2018` end) AS Diluted_WASO
+FROM sbux_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'sbux' AS Ticker, 2019 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2019` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2019` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2019` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2019` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2019` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2019` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2019` end) AS Diluted_WASO
+FROM sbux_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'sbux' AS Ticker, 2020 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2020` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2020` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2020` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2020` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2020` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2020` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2020` end) AS Diluted_WASO
+FROM sbux_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'sbux' AS Ticker, 2021 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2021` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2021` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2021` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2021` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2021` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2021` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2021` end) AS Diluted_WASO
+FROM sbux_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'sbux' AS Ticker, 2022 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2022` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2022` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2022` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2022` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2022` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2022` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2022` end) AS Diluted_WASO
+FROM sbux_income;
+
+-- TSLA 
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'tsla' AS Ticker, 2013 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2013` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2013` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2013` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2013` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2013` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2013` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2013` end) AS Diluted_WASO
+FROM tsla_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'tsla' AS Ticker, 2014 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2014` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2014` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2014` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2014` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2014` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2014` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2014` end) AS Diluted_WASO
+FROM tsla_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'tsla' AS Ticker, 2015 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2015` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2015` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2015` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2015` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2015` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2015` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2015` end) AS Diluted_WASO
+FROM tsla_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'tsla' AS Ticker, 2016 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2016` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2016` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2016` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2016` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2016` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2016` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2016` end) AS Diluted_WASO
+FROM tsla_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'tsla' AS Ticker, 2017 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2017` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2017` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2017` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2017` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2017` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2017` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2017` end) AS Diluted_WASO
+FROM tsla_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'tsla' AS Ticker, 2018 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2018` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2018` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2018` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2018` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2018` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2018` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2018` end) AS Diluted_WASO
+FROM tsla_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'tsla' AS Ticker, 2019 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2019` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2019` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2019` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2019` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2019` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2019` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2019` end) AS Diluted_WASO
+FROM tsla_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'tsla' AS Ticker, 2020 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2020` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2020` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2020` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2020` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2020` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2020` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2020` end) AS Diluted_WASO
+FROM tsla_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'tsla' AS Ticker, 2021 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2021` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2021` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2021` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2021` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2021` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2021` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2021` end) AS Diluted_WASO
+FROM tsla_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'tsla' AS Ticker, 2022 AS Year, 
+		MAX(CASE WHEN Income_category = 'Total_Revenue' THEN `2022` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2022` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2022` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2022` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2022` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2022` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2022` end) AS Diluted_WASO
+FROM tsla_income;
+
+-- MFST
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'mfst' AS Ticker, 2014 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2014` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2014` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2014` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2014` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2014` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2014` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2014` end) AS Diluted_WASO
+FROM mfst_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'mfst' AS Ticker, 2015 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2015` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2015` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2015` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2015` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2015` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2015` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2015` end) AS Diluted_WASO
+FROM mfst_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'mfst' AS Ticker, 2016 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2016` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2016` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2016` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2016` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2016` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2016` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2016` end) AS Diluted_WASO
+FROM mfst_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'mfst' AS Ticker, 2017 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2017` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2017` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2017` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2017` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2017` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2017` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2017` end) AS Diluted_WASO
+FROM mfst_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'mfst' AS Ticker, 2018 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2018` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2018` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2018` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2018` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2018` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2018` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2018` end) AS Diluted_WASO
+FROM mfst_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'mfst' AS Ticker, 2019 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2019` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2019` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2019` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2019` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2019` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2019` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2019` end) AS Diluted_WASO
+FROM mfst_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'mfst' AS Ticker, 2020 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2020` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2020` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2020` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2020` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2020` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2020` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2020` end) AS Diluted_WASO
+FROM mfst_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'mfst' AS Ticker, 2021 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2021` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2021` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2021` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2021` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2021` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2021` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2021` end) AS Diluted_WASO
+FROM mfst_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'mfst' AS Ticker, 2022 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2022` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2022` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2022` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2022` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2022` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2022` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2022` end) AS Diluted_WASO
+FROM mfst_income;
+
+INSERT INTO income (Ticker, Year, Revenue, Operating_Income, Net_Income, Basic_EPS, Diluted_EPS, Basic_WASO, Diluted_WASO)
+SELECT 'mfst' AS Ticker, 2023 AS Year, 
+		MAX(CASE WHEN Income_category = 'Revenue' THEN `2023` end) AS Revenue,
+        MAX(CASE WHEN Income_category = 'Operating_Income' THEN `2023` end) AS Operating_Income,
+        MAX(CASE WHEN Income_category = 'Net_Income' THEN `2023` end) AS Net_Income,
+        MAX(CASE WHEN Income_category = 'Basic_EPS' THEN `2023` end) AS Basic_EPS,
+        MAX(CASE WHEN Income_category = 'Diluted_EPS' THEN `2023` end) AS Diluted_EPS,
+        MAX(CASE WHEN Income_category = 'Basic_WASO' THEN `2023` end) AS Basic_WASO,
+        MAX(CASE WHEN Income_category = 'Diluted_WASO' THEN `2023` end) AS Diluted_WASO
+FROM mfst_income;
+
+-- SELECT *
+-- FROM Income;
+
+-- SELECT Ticker, COUNT(*)
+-- FROM Income
+-- GROUP BY Ticker;
+-- ------------------------------------------------------------------------------------------------
+-- Question 2
+SELECT Sector, Industry, Company
+FROM Company
+ORDER BY Sector ASC, Industry ASC;
+
+-- Question 3
+SELECT s.Ticker, c.Company, s.Date, FORMAT(s.Volume, 0) AS Volume, s.Open, s.Close
+FROM Stock s
+JOIN Company c ON s.Ticker = c.Ticker
+WHERE c.Company = 'Amazon.com Inc' AND YEAR(s.Date) = 2023 AND MONTH(s.Date) IN (10, 11)
+ORDER BY s.Date DESC;
+
+-- Question 4
+SELECT c.Ticker, c.Company, 
+	FORMAT(MIN(i.Net_Income) / 1000000, 0) AS "Minimum Net Income in Millions",
+    FORMAT(MAX(i.Net_Income) / 1000000, 0) AS "Maximum Net Income in Millions"
+FROM Company c
+JOIN Income i ON c.Ticker = i.Ticker
+GROUP BY c.Ticker, c.Company
+ORDER BY c.Company ASC;
+
+-- Question 5
+SELECT s.Ticker, c.Company, s.Date, c.Morningstar_Size AS "Size", c.Morningstart_Style AS "Style",
+    CONCAT('$', FORMAT(s.Close, 2)) AS "Closing Price",
+    CONCAT('$', FORMAT(ROUND(s.Close * i.Diluted_WASO / 1000000, 2), 2)) AS "Market Cap in Millions",
+    FORMAT(i.Diluted_WASO / 1000000, 0) AS "Diluted WASO in Millions",
+    FORMAT(i.Basic_WASO / 1000000, 0) AS "Basic WASO in Millions",
+    CONCAT('$', FORMAT(i.Diluted_WASO * s.Close / 1000000, 2)) AS "Diluted Market Cap in Millions"
+FROM Stock s
+JOIN Company c ON s.Ticker = c.Ticker
+JOIN Income i ON s.Ticker = i.Ticker AND YEAR(s.Date) = i.Year
+WHERE MONTH(s.Date) IN (10, 11)
+ORDER BY c.Company ASC,s.Date DESC;
+
+-- Question 6
+SELECT s.Ticker, c.Company, s.Date, CONCAT('$', FORMAT(s.Close, 2)) AS "Closing Price"
+FROM Stock s
+JOIN Company c ON s.Ticker = c.Ticker
+WHERE (s.Date BETWEEN '2023-01-01' AND '2023-12-31')
+    AND (s.Close = (SELECT MAX(Close) FROM Stock WHERE YEAR(Date) = 2023)
+         OR s.Close = (SELECT MIN(Close) FROM Stock WHERE YEAR(Date) = 2023))
+ORDER BY s.Close DESC;
+
+-- Question 7
+SELECT s1.Ticker,c.Company, s1.Date AS "First_Date", s2.Date AS "Last_Date",
+    FORMAT(s1.Open, 2) AS "Opening Price", FORMAT(s2.Close, 2) AS "Closing Price",
+    CONCAT(ROUND(((s2.Close - s1.Open) / s1.Open) * 100), '%') AS "Percentage Decline"
+FROM Stock s1
+JOIN Stock s2 ON s1.Ticker = s2.Ticker AND DATE_ADD(s1.Date, INTERVAL 1 DAY) = s2.Date
+JOIN Company c ON s1.Ticker = c.Ticker
+WHERE ((s2.Close - s1.Open) / s1.Open) * 100 <= -12
+ORDER BY "Percentage Decline" DESC;
+
+-- Question 8 
+SELECT c.Ticker, c.Company
+FROM Company AS c
+WHERE c.Ticker NOT IN (SELECT s1.Ticker
+    FROM Stock AS s1
+    JOIN Stock AS s2 ON s1.Ticker = s2.Ticker AND s1.Date = DATE_SUB(s2.Date, INTERVAL 1 DAY)
+    JOIN Company c ON c.Ticker = s2.Ticker
+    WHERE s2.Close <= (0.88 * s1.Open) 
+    ORDER BY s1.Ticker, s1.Date);
+
+-- Question 9 
+SELECT Morningstar_Size, Morningstart_Style, c.Ticker, Company, Fiscal_Year_End, i.Year,
+CONCAT('$', FORMAT((Net_Income)/1000000, 0)) AS "Net Income in Millions",
+'Highest Net Income' AS Comment
+FROM Company AS c
+JOIN Income AS i ON i.Ticker = c.Ticker
+WHERE i.Year = 2022 AND Net_Income = ( SELECT MAX(Net_Income) FROM Company AS c2
+	JOIN Income as i2 on i2.Ticker = c2.Ticker
+    WHERE i2.Year= 2022 AND c2.Morningstar_Size = c.Morningstar_size AND c2.Morningstart_Style = c.Morningstart_Style
+)
+UNION 
+SELECT Morningstar_Size, Morningstart_Style, c.Ticker, Company, Fiscal_Year_End, i.Year,
+CONCAT('$', FORMAT((Net_Income)/1000000, 0)) AS "Net Income in Millions",
+'Lowest Net Income' AS Comment
+FROM Company AS c
+JOIN Income AS i ON i.Ticker = c.Ticker
+WHERE i.Year = 2022 AND Net_Income = ( SELECT MIN(Net_Income) FROM Company AS c2
+	JOIN Income as i2 on i2.Ticker = c2.Ticker
+    WHERE i2.Year= 2022 AND c2.Morningstar_Size = c.Morningstar_size AND c2.Morningstart_Style = c.Morningstart_Style
+);
